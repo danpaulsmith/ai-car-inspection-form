@@ -3,161 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Vehicle Inspector Pro</title>
+    <title>Global AI Car Inspector 2026</title>
     <script type="module">
         import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
         window.GoogleGenerativeAI = GoogleGenerativeAI;
     </script>
     <style>
-        :root { --blue: #1a237e; --green: #2e7d32; --red: #c62828; --gold: #fbc02d; }
-        body { font-family: sans-serif; background: #f0f2f5; margin: 0; padding-bottom: 120px; }
+        :root { --cobalt: #002f6c; --gold: #ffc107; --bg: #f4f7f6; --success: #28a745; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; padding-bottom: 120px; }
         .container { max-width: 500px; margin: auto; padding: 15px; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 15px; }
-        h2 { font-size: 0.9rem; color: #666; text-transform: uppercase; margin-top: 0; }
-        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
-        .btn-ai { background: var(--blue); color: white; border: none; font-weight: bold; cursor: pointer; }
-        .btn-ai:disabled { background: #999; }
-        .item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
-        .item-info { flex: 1; }
-        .item-title { font-weight: bold; display: block; }
-        .item-sub { font-size: 0.75rem; color: #888; }
-        .footer { position: fixed; bottom: 0; width: 100%; background: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-top: 4px solid var(--blue); box-shadow: 0 -5px 15px rgba(0,0,0,0.1); box-sizing: border-box; }
-        #finalPrice { font-size: 1.8rem; font-weight: 800; color: var(--green); }
-        .error-msg { color: var(--red); font-size: 0.8rem; display: none; margin-bottom: 10px; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.05); margin-bottom: 20px; border-left: 5px solid var(--cobalt); }
+        h2 { font-size: 0.85rem; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-top: 0; }
+        input, button { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 1rem; box-sizing: border-box; }
+        .btn-ai { background: var(--cobalt); color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-ai:active { transform: scale(0.98); }
+        .item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; }
+        .item-title { font-weight: 600; display: block; font-size: 0.95rem; }
+        .item-sub { font-size: 0.75rem; color: #777; }
+        
+        .footer { position: fixed; bottom: 0; width: 100%; background: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-top: 2px solid #eee; box-shadow: 0 -10px 20px rgba(0,0,0,0.05); box-sizing: border-box; }
+        #finalPrice { font-size: 2rem; font-weight: 900; color: var(--success); }
+        .location-tag { font-size: 0.7rem; color: #666; background: #eee; padding: 2px 8px; border-radius: 4px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="card" style="background: var(--blue); color: white; text-align: center;">
-        <h1 style="margin:0; font-size: 1.2rem;">Global AI Negotiator</h1>
+    <div style="text-align: center; padding: 20px 0;">
+        <h1 style="margin:0; color: var(--cobalt);">AI Inspector <span style="color:var(--gold)">Pro</span></h1>
+        <p style="font-size: 0.8rem; color: #666;">Global Market Valuation & Fault Detection</p>
     </div>
 
     <div class="card">
-        <h2>Setup Context</h2>
-        <input type="text" id="car" placeholder="e.g. 2012 Toyota Hilux">
-        <input type="text" id="loc" placeholder="City, Country (e.g. Tokyo, JP)">
-        <input type="number" id="startPrice" placeholder="Asking Price" value="5000" oninput="calculate()">
+        <h2>Vehicle & Location</h2>
+        <input type="text" id="car" placeholder="Year, Make, Model (e.g. 2018 BMW 330i)">
+        <input type="text" id="loc" placeholder="City, Country (e.g. London, UK or Sydney, AU)">
+        <input type="number" id="startPrice" placeholder="Asking Price" value="15000" oninput="calculate()">
         
-        <div id="aiError" class="error-msg">⚠️ Quota limit hit. Using standard fallback data.</div>
-        <button class="btn-ai" id="aiBtn" onclick="generateAI()">✨ Generate Inspection List</button>
+        <button class="btn-ai" id="aiBtn" onclick="generateAI()">🔍 RUN AI MECHANICAL SCAN</button>
     </div>
 
-    <div id="inspectionArea">
-        <div class="card">
-            <h2>Safety & Tires</h2>
-            <div class="item">
-                <div class="item-info"><span class="item-title">Worn Tires</span><span class="item-sub">Price per tire replacement</span></div>
-                <input type="number" class="multiplier" data-cost="150" value="0" min="0" max="5" style="width: 60px;" oninput="calculate()">
-            </div>
-            <div class="item">
-                <div class="item-info"><span class="item-title">Structural Rust</span><span class="item-sub">Chassis/Sills damage</span></div>
-                <input type="checkbox" class="deduct" data-cost="2000" onchange="calculate()">
-            </div>
+    <div id="resultsArea">
         </div>
-    </div>
 </div>
 
 <div class="footer">
     <div>
-        <div id="laborRateDisplay" style="font-size: 0.7rem; color: #888;">Labor: Global Avg ($120/hr)</div>
-        <div style="font-size: 0.7rem; font-weight: bold;">FAIR OFFER:</div>
+        <span id="locLabel" class="location-tag">Global Mode</span>
+        <div style="font-size: 0.75rem; font-weight: bold; margin-top: 5px;">MAX OFFER:</div>
     </div>
     <div style="text-align: right;">
-        <div id="finalPrice">$5,000</div>
-        <button onclick="toggleKey()" style="font-size: 0.6rem; padding: 2px 5px; width: auto; background: none; border: 1px solid #ccc;">⚙️ API KEY</button>
+        <div id="finalPrice">$15,000</div>
+        <button onclick="setupKey()" style="background:none; border:none; color:blue; text-decoration:underline; font-size:0.6rem; cursor:pointer;">Set API Key</button>
     </div>
-</div>
-
-<div id="keyOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:9999; padding:50px 20px; color:white;">
-    <h3>Gemini API Key</h3>
-    <p style="font-size: 0.8rem;">Required for dynamic faults. Get one for free at aistudio.google.com</p>
-    <input type="password" id="apiKey" placeholder="Paste Key Here">
-    <button class="btn-ai" onclick="toggleKey()">Save & Close</button>
 </div>
 
 <script>
-    let laborRate = 120;
+    let currentCurrency = "$";
 
     async function generateAI() {
-        const key = document.getElementById('apiKey').value;
+        const key = localStorage.getItem('gemini_key');
         const car = document.getElementById('car').value;
         const loc = document.getElementById('loc').value;
         const btn = document.getElementById('aiBtn');
-        const err = document.getElementById('aiError');
 
-        if (!key) { toggleKey(); return; }
-        if (!car) { alert("Enter a car model!"); return; }
+        if (!key) { setupKey(); return; }
+        if (!car || !loc) { alert("Please fill in car and location!"); return; }
 
         btn.disabled = true;
-        btn.innerText = "Analyzing Model Data...";
-        err.style.display = "none";
+        btn.innerText = "Accessing Global Repair Data...";
 
-        try {
-            const genAI = new window.GoogleGenerativeAI(key);
-            // Switched to 1.5-flash for better free-tier reliability
-            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        // 2026 Model Priority: 2.5 Flash is the modern standard. 
+        // 1.5 is 404/Retired.
+        const modelsToTry = ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.0-flash"];
+        let success = false;
 
-            const prompt = `Act as a master mechanic. For a ${car} in ${loc}:
-            1. Return local mechanic hourly labor rate in local currency.
-            2. List an exhaustive list of specific things to check when purchasing second hand.
-            JSON ONLY: {"rate": number, "faults": [{"title": "Fault", "sub": "Desc", "cost": 500}]}`;
+        for (let modelName of modelsToTry) {
+            try {
+                const genAI = new window.GoogleGenerativeAI(key);
+                const model = genAI.getGenerativeModel({ model: modelName });
 
-            const result = await model.generateContent(prompt);
-            const data = JSON.parse(result.response.text().replace(/```json|```/g, ""));
-            
-            laborRate = data.rate;
-            renderFaults(data.faults, "Model-Specific Issues (AI)");
-            document.getElementById('laborRateDisplay').innerText = `Labor in ${loc}: $${laborRate}/hr`;
-            btn.innerText = "✨ AI Analysis Complete";
-        } catch (e) {
-            console.error(e);
-            err.style.display = "block";
-            btn.innerText = "Loaded Standard Checks";
-            loadFallback();
-        } finally {
-            btn.disabled = false;
-            calculate();
+                const prompt = `Act as a master mechanic. For a ${car} located in ${loc}:
+                1. Identify the local currency and average mechanic labor rate in ${loc}.
+                2. List 6 specific mechanical/structural faults for this exact model.
+                3. Estimate repair costs based on ${loc} pricing.
+                Return ONLY JSON: {"currency": "string", "labor": number, "faults": [{"name": "string", "desc": "string", "cost": number}]}`;
+
+                const result = await model.generateContent(prompt);
+                const data = JSON.parse(result.response.text().replace(/```json|```/g, ""));
+                
+                renderResults(data, loc);
+                success = true;
+                break; 
+            } catch (e) {
+                console.warn(`Model ${modelName} failed, trying next...`, e);
+            }
         }
+
+        if (!success) {
+            alert("API Error: All 2026 models returned a 404 or Quota error. Check your API key or billing status at Google AI Studio.");
+        }
+        
+        btn.disabled = false;
+        btn.innerText = "🔍 RUN AI MECHANICAL SCAN";
     }
 
-    function renderFaults(faults, sectionTitle) {
-        let html = `<div class="card"><h2>${sectionTitle}</h2>`;
-        faults.forEach(f => {
+    function renderResults(data, loc) {
+        currentCurrency = data.currency || "$";
+        document.getElementById('locLabel').innerText = `${loc} (${currentCurrency}${data.labor}/hr)`;
+        
+        let html = `<div class="card"><h2>Specific Faults for ${loc}</h2>`;
+        data.faults.forEach(f => {
             html += `
             <div class="item">
-                <div class="item-info"><span class="item-title">${f.title}</span><span class="item-sub">${f.sub} (-$${f.cost})</span></div>
-                <input type="checkbox" class="deduct" data-cost="${f.cost}" onchange="calculate()">
+                <div class="item-info">
+                    <span class="item-title">${f.name}</span>
+                    <span class="item-sub">${f.desc}</span>
+                </div>
+                <div style="text-align:right">
+                    <div style="font-size:0.7rem; color:red; font-weight:bold;">-${currentCurrency}${f.cost}</div>
+                    <input type="checkbox" class="deduct" data-cost="${f.cost}" onchange="calculate()">
+                </div>
             </div>`;
         });
         html += `</div>`;
-        document.getElementById('inspectionArea').innerHTML += html;
-    }
-
-    function loadFallback() {
-        const fallback = [
-            {title: "Transmission Slipping", sub: "Delayed gear changes", cost: 2500},
-            {title: "Head Gasket Leak", sub: "Milky oil or overheating", cost: 1800},
-            {title: "Suspension Knocking", sub: "Bushings/Shocks worn", cost: 600}
-        ];
-        renderFaults(fallback, "Common Mechanical Checks");
+        document.getElementById('resultsArea').innerHTML = html;
+        calculate();
     }
 
     function calculate() {
-        let price = parseInt(document.getElementById('startPrice').value) || 0;
+        let start = parseInt(document.getElementById('startPrice').value) || 0;
         let deduct = 0;
         document.querySelectorAll('.deduct:checked').forEach(el => deduct += parseInt(el.dataset.cost));
-        document.querySelectorAll('.multiplier').forEach(el => deduct += (parseInt(el.value) * parseInt(el.dataset.cost)));
         
-        const final = Math.max(0, price - deduct);
-        document.getElementById('finalPrice').innerText = "$" + Math.round(final).toLocaleString();
-        document.getElementById('finalPrice').style.color = final < price * 0.5 ? "var(--red)" : "var(--green)";
+        const final = Math.max(0, start - deduct);
+        document.getElementById('finalPrice').innerText = currentCurrency + final.toLocaleString();
     }
 
-    function toggleKey() {
-        const overlay = document.getElementById('keyOverlay');
-        overlay.style.display = overlay.style.display === 'none' ? 'block' : 'none';
+    function setupKey() {
+        const key = prompt("Enter your Gemini API Key (from aistudio.google.com):");
+        if (key) localStorage.setItem('gemini_key', key);
     }
 </script>
+
 </body>
 </html>
