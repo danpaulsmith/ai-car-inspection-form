@@ -3,189 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global AI Car Inspector</title>
+    <title>AI Vehicle Inspector Pro</title>
     <script type="module">
         import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
         window.GoogleGenerativeAI = GoogleGenerativeAI;
     </script>
     <style>
-        :root { --primary: #1a237e; --accent: #ffd600; --danger: #b71c1c; --success: #2e7d32; --bg: #f8f9fa; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: #333; margin: 0; padding-bottom: 140px; }
-        .container { max-width: 600px; margin: auto; padding: 15px; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 15px; border-top: 4px solid var(--primary); }
-        h2 { font-size: 1rem; color: var(--primary); margin-top: 0; text-transform: uppercase; border-bottom: 1px solid #eee; padding-bottom: 8px; }
-        
-        .input-group { margin-bottom: 15px; }
-        label { display: block; font-size: 0.8rem; font-weight: bold; margin-bottom: 5px; color: #666; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
-        
-        .btn-ai { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-ai:disabled { opacity: 0.6; cursor: not-allowed; }
-
-        .item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
-        .item-info { flex-grow: 1; padding-right: 10px; }
-        .item-title { font-weight: bold; font-size: 0.9rem; }
-        .item-sub { font-size: 0.75rem; color: #888; display: block; }
-        
-        .sticky-footer { position: fixed; bottom: 0; width: 100%; background: white; border-top: 4px solid var(--primary); padding: 15px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; z-index: 1000; box-shadow: 0 -5px 15px rgba(0,0,0,0.1); }
-        .price-display { text-align: right; }
-        #finalPrice { font-size: 1.8rem; font-weight: 900; color: var(--success); }
-        .labor-tag { font-size: 0.7rem; color: #666; font-style: italic; }
-
-        #keyModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; color: white; padding: 40px 20px; }
+        :root { --blue: #1a237e; --green: #2e7d32; --red: #c62828; --gold: #fbc02d; }
+        body { font-family: sans-serif; background: #f0f2f5; margin: 0; padding-bottom: 120px; }
+        .container { max-width: 500px; margin: auto; padding: 15px; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 15px; }
+        h2 { font-size: 0.9rem; color: #666; text-transform: uppercase; margin-top: 0; }
+        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
+        .btn-ai { background: var(--blue); color: white; border: none; font-weight: bold; cursor: pointer; }
+        .btn-ai:disabled { background: #999; }
+        .item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .item-info { flex: 1; }
+        .item-title { font-weight: bold; display: block; }
+        .item-sub { font-size: 0.75rem; color: #888; }
+        .footer { position: fixed; bottom: 0; width: 100%; background: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-top: 4px solid var(--blue); box-shadow: 0 -5px 15px rgba(0,0,0,0.1); box-sizing: border-box; }
+        #finalPrice { font-size: 1.8rem; font-weight: 800; color: var(--green); }
+        .error-msg { color: var(--red); font-size: 0.8rem; display: none; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="card" style="background: var(--primary); color: white; border: none; text-align: center;">
-        <h1 style="margin:0; font-size: 1.4rem;">AI Negotiator Pro</h1>
-        <p style="margin:5px 0 0; font-size: 0.8rem; opacity: 0.8;">Global Valuation & Inspection</p>
+    <div class="card" style="background: var(--blue); color: white; text-align: center;">
+        <h1 style="margin:0; font-size: 1.2rem;">Global AI Negotiator</h1>
     </div>
 
     <div class="card">
-        <h2>1. Context</h2>
-        <div class="input-group">
-            <label>VEHICLE (YEAR MAKE MODEL)</label>
-            <input type="text" id="vehicleName" placeholder="e.g. 2000 Suzuki Wagon R">
-        </div>
-        <div class="input-group">
-            <label>LOCATION (CITY, COUNTRY)</label>
-            <input type="text" id="locationName" placeholder="e.g. Wellington, NZ or London, UK">
-        </div>
-        <div class="input-group">
-            <label>ASKING PRICE</label>
-            <input type="number" id="startPrice" value="2800" oninput="calculate()">
-        </div>
-        <button class="btn-ai" id="aiBtn" onclick="generateAI()">✨ LOAD MODEL-SPECIFIC FAULTS</button>
+        <h2>Setup Context</h2>
+        <input type="text" id="car" placeholder="e.g. 2012 Toyota Hilux">
+        <input type="text" id="loc" placeholder="City, Country (e.g. Tokyo, JP)">
+        <input type="number" id="startPrice" placeholder="Asking Price" value="5000" oninput="calculate()">
+        
+        <div id="aiError" class="error-msg">⚠️ Quota limit hit. Using standard fallback data.</div>
+        <button class="btn-ai" id="aiBtn" onclick="generateAI()">✨ Generate Inspection List</button>
     </div>
 
-    <div id="dynamicSections">
-        </div>
-
-    <div class="card">
-        <h2>Standard Checks</h2>
-        <div class="item">
-            <div class="item-info"><span class="item-title">Worn Tires</span><span class="item-sub">Price per tire replacement</span></div>
-            <input type="number" class="multiplier" data-cost="160" value="0" min="0" max="5" oninput="calculate()">
-        </div>
-        <div class="item">
-            <div class="item-info"><span class="item-title">Broken Windows</span><span class="item-sub">Regulator/Motor failure</span></div>
-            <input type="number" class="multiplier" data-cost="300" value="0" min="0" max="4" oninput="calculate()">
-        </div>
-        <div class="item">
-            <div class="item-info"><span class="item-title">Structural Rust</span><span class="item-sub">Chassis/A-Pillars</span></div>
-            <input type="checkbox" class="deduct" data-cost="5000" onchange="calculate()">
+    <div id="inspectionArea">
+        <div class="card">
+            <h2>Safety & Tires</h2>
+            <div class="item">
+                <div class="item-info"><span class="item-title">Worn Tires</span><span class="item-sub">Price per tire replacement</span></div>
+                <input type="number" class="multiplier" data-cost="150" value="0" min="0" max="5" style="width: 60px;" oninput="calculate()">
+            </div>
+            <div class="item">
+                <div class="item-info"><span class="item-title">Structural Rust</span><span class="item-sub">Chassis/Sills damage</span></div>
+                <input type="checkbox" class="deduct" data-cost="2000" onchange="calculate()">
+            </div>
         </div>
     </div>
 </div>
 
-<div class="sticky-footer">
+<div class="footer">
     <div>
-        <span id="laborInfo" class="labor-tag">Labor: Default ($120/hr)</span>
-        <div style="font-size: 0.7rem; font-weight: bold; color: #999;">OFFER THIS:</div>
+        <div id="laborRateDisplay" style="font-size: 0.7rem; color: #888;">Labor: Global Avg ($120/hr)</div>
+        <div style="font-size: 0.7rem; font-weight: bold;">FAIR OFFER:</div>
     </div>
-    <div class="price-display">
-        <div id="finalPrice">$2,800</div>
-        <button onclick="document.getElementById('keyModal').style.display='block'" style="background:none; border:1px solid #ddd; font-size: 0.6rem; padding: 2px 5px; border-radius: 3px;">⚙️ API KEY</button>
+    <div style="text-align: right;">
+        <div id="finalPrice">$5,000</div>
+        <button onclick="toggleKey()" style="font-size: 0.6rem; padding: 2px 5px; width: auto; background: none; border: 1px solid #ccc;">⚙️ API KEY</button>
     </div>
 </div>
 
-<div id="keyModal">
-    <h3>Enter Gemini API Key</h3>
-    <input type="password" id="apiKey" placeholder="Paste your key here...">
-    <button class="btn-ai" style="margin-top:20px;" onclick="saveKey()">ACTIVATE</button>
-    <p style="font-size: 0.7rem; opacity: 0.6; margin-top: 10px;">Get a free key at aistudio.google.com. Key is stored only in this browser session.</p>
+<div id="keyOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:9999; padding:50px 20px; color:white;">
+    <h3>Gemini API Key</h3>
+    <p style="font-size: 0.8rem;">Required for dynamic faults. Get one for free at aistudio.google.com</p>
+    <input type="password" id="apiKey" placeholder="Paste Key Here">
+    <button class="btn-ai" onclick="toggleKey()">Save & Close</button>
 </div>
 
 <script>
-    let localLaborRate = 120;
+    let laborRate = 120;
 
     async function generateAI() {
         const key = document.getElementById('apiKey').value;
-        const car = document.getElementById('vehicleName').value;
-        const loc = document.getElementById('locationName').value;
+        const car = document.getElementById('car').value;
+        const loc = document.getElementById('loc').value;
         const btn = document.getElementById('aiBtn');
+        const err = document.getElementById('aiError');
 
-        if (!key) { document.getElementById('keyModal').style.display='block'; return; }
-        if (!car || !loc) { alert("Please enter car and location first!"); return; }
+        if (!key) { toggleKey(); return; }
+        if (!car) { alert("Enter a car model!"); return; }
 
         btn.disabled = true;
-        btn.innerText = "Consulting AI Knowledge...";
+        btn.innerText = "Analyzing Model Data...";
+        err.style.display = "none";
 
         try {
             const genAI = new window.GoogleGenerativeAI(key);
-            // Updated model name to be more resilient
-            const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+            // Switched to 1.5-flash for better free-tier reliability
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
             const prompt = `Act as a master mechanic. For a ${car} in ${loc}:
-            1. Identify the average hourly mechanic labor rate in ${loc}.
-            2. List 6 exhaustive technical faults specific to this model.
-            Return ONLY a JSON object: {"laborRate": number, "faults": [{"title": string, "sub": string, "cost": number}]}`;
+            1. Return local mechanic hourly labor rate in local currency.
+            2. List an exhaustive list of specific things to check when purchasing second hand.
+            JSON ONLY: {"rate": number, "faults": [{"title": "Fault", "sub": "Desc", "cost": 500}]}`;
 
             const result = await model.generateContent(prompt);
-            const responseText = result.response.text().replace(/```json|```/g, "").trim();
-            const data = JSON.parse(responseText);
-
-            localLaborRate = data.laborRate;
-            document.getElementById('laborInfo').innerText = `Labor in ${loc}: $${localLaborRate}/hr`;
-
-            let html = '<div class="card"><h2>Model Specific Faults</h2>';
-            data.faults.forEach((f, i) => {
-                html += `
-                <div class="item">
-                    <div class="item-info">
-                        <span class="item-title">${f.title}</span>
-                        <span class="item-sub">${f.sub} (-$${f.cost})</span>
-                    </div>
-                    <input type="checkbox" class="deduct" data-cost="${f.cost}" onchange="calculate()">
-                </div>`;
-            });
-            html += '</div>';
-            document.getElementById('dynamicSections').innerHTML = html;
+            const data = JSON.parse(result.response.text().replace(/```json|```/g, ""));
             
-            btn.innerText = "✨ CHECKLIST UPDATED";
-            btn.disabled = false;
-            calculate();
-
+            laborRate = data.rate;
+            renderFaults(data.faults, "Model-Specific Issues (AI)");
+            document.getElementById('laborRateDisplay').innerText = `Labor in ${loc}: $${laborRate}/hr`;
+            btn.innerText = "✨ AI Analysis Complete";
         } catch (e) {
             console.error(e);
-            alert("API Error: " + e.message + "\n\nTry checking your key or model name.");
-            btn.innerText = "❌ ERROR - RETRY?";
+            err.style.display = "block";
+            btn.innerText = "Loaded Standard Checks";
+            loadFallback();
+        } finally {
             btn.disabled = false;
+            calculate();
         }
+    }
+
+    function renderFaults(faults, sectionTitle) {
+        let html = `<div class="card"><h2>${sectionTitle}</h2>`;
+        faults.forEach(f => {
+            html += `
+            <div class="item">
+                <div class="item-info"><span class="item-title">${f.title}</span><span class="item-sub">${f.sub} (-$${f.cost})</span></div>
+                <input type="checkbox" class="deduct" data-cost="${f.cost}" onchange="calculate()">
+            </div>`;
+        });
+        html += `</div>`;
+        document.getElementById('inspectionArea').innerHTML += html;
+    }
+
+    function loadFallback() {
+        const fallback = [
+            {title: "Transmission Slipping", sub: "Delayed gear changes", cost: 2500},
+            {title: "Head Gasket Leak", sub: "Milky oil or overheating", cost: 1800},
+            {title: "Suspension Knocking", sub: "Bushings/Shocks worn", cost: 600}
+        ];
+        renderFaults(fallback, "Common Mechanical Checks");
     }
 
     function calculate() {
-        let start = parseInt(document.getElementById('startPrice').value) || 0;
-        let deductions = 0;
-
-        document.querySelectorAll('.multiplier').forEach(input => {
-            deductions += (parseInt(input.value) * parseInt(input.dataset.cost));
-        });
-
-        document.querySelectorAll('.deduct').forEach(check => {
-            if (check.checked) deductions += parseInt(check.dataset.cost);
-        });
-
-        let total = start - deductions;
-        const display = document.getElementById('finalPrice');
-
-        if (total <= 0) {
-            display.innerText = "WALK AWAY";
-            display.style.color = "#b71c1c";
-        } else {
-            display.innerText = "$" + Math.round(total).toLocaleString();
-            display.style.color = "#2e7d32";
-        }
+        let price = parseInt(document.getElementById('startPrice').value) || 0;
+        let deduct = 0;
+        document.querySelectorAll('.deduct:checked').forEach(el => deduct += parseInt(el.dataset.cost));
+        document.querySelectorAll('.multiplier').forEach(el => deduct += (parseInt(el.value) * parseInt(el.dataset.cost)));
+        
+        const final = Math.max(0, price - deduct);
+        document.getElementById('finalPrice').innerText = "$" + Math.round(final).toLocaleString();
+        document.getElementById('finalPrice').style.color = final < price * 0.5 ? "var(--red)" : "var(--green)";
     }
 
-    function saveKey() {
-        if(document.getElementById('apiKey').value) {
-            document.getElementById('keyModal').style.display = 'none';
-        }
+    function toggleKey() {
+        const overlay = document.getElementById('keyOverlay');
+        overlay.style.display = overlay.style.display === 'none' ? 'block' : 'none';
     }
 </script>
-
 </body>
 </html>
